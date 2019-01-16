@@ -19,7 +19,7 @@ export default function createGame(elem: HTMLElement, width: number, height: num
       matter: {
         debug: true,
         gravity: {
-          y: 1,
+          y: 0.7,
         },
       },
     },

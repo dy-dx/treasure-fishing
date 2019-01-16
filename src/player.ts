@@ -62,6 +62,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     }, {
       friction: 0.1,
       frictionAir: 0.1,
+      density: 0.1, // default 0.001
       chamfer: { radius: 4 },
       render: {
         sprite: {
@@ -123,7 +124,6 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     }
 
     this.hookedChest = body.gameObject as Phaser.Physics.Matter.Sprite;
-    this.hookedChest.setMass(0.1);
 
     this.scene.matter.add.joint(this.hook, body.parent, 0, 0.6, {
       pointA: {x: 0, y: 0},
@@ -158,7 +158,9 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     const segment = (this.scene.add.rectangle(x, y, 6, 18, 0x00aa00) as any as IRopeSegment);
     this.scene.matter.add.gameObject(segment, {
       chamfer: { radius: 2 },
-      mass: 0.01,
+      // mass: 0.01,
+      // the higher the density, the less stretchy the rope becomes
+      density: 0.01, // default 0.001
       friction: 0.05,
       frictionAir: 0.1,
     });

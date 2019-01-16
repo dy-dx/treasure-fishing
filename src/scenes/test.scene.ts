@@ -66,6 +66,8 @@ export class TestScene extends Phaser.Scene {
         Bodies.rectangle(0, chest.height * -0.5 - 10, 20, 20, { isSensor: true }),
       ],
       // mass: 0.1,
+      density: 0.1,
+      frictionAir: 0.1,
       // friction: 0.5,
       // frictionStatic: 10,
     });
