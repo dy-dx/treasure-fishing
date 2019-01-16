@@ -51,7 +51,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
 
     this.ropeSegments = [];
     const tail = this.addRopeSegment();
-    tail.hook = this.scene.matter.add.sprite(tail.x, tail.y + 60, "hook", undefined, {});
+    tail.hook = this.scene.matter.add.sprite(tail.x, tail.y + 20, "hook", undefined, {});
     this.hook = tail.hook;
     tail.hook.setName("hook");
     tail.hook.setDisplayOrigin(10, 10);
@@ -78,9 +78,9 @@ export class Player extends Phaser.Physics.Matter.Sprite {
       this.scene.BoundsCollisionCategory,
       this.scene.ChestCollisionCategory,
     ]);
-    tail.joint = this.scene.matter.add.joint(tail, tail.hook, 8, 0.6, {
-        pointA: {x: 0, y: 4},
-        pointB: {x: 3, y: -10},
+    tail.joint = this.scene.matter.add.joint(tail, tail.hook, 0, 0.6, {
+        pointA: {x: 0, y: 8},
+        pointB: {x: 4, y: -13},
         render: {
           anchors: false,
           lineWidth: 1,
@@ -174,7 +174,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     this.ropeSegments.push(segment);
     if (head) {
       head.setStatic(false);
-      head.setY(head.y + 12);
+      head.setY(head.y + 20);
 
       const joint = this.scene.matter.add.joint(segment, head, 8, 0.6, {
         pointA: {x: 0, y: 4},
