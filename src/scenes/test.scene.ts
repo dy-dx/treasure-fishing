@@ -1,3 +1,5 @@
+// @ts-ignore
+import hookSprite from "../assets/icons8-fishing-hook-30.png";
 import { Player } from "../player";
 
 export class TestScene extends Phaser.Scene {
@@ -13,15 +15,20 @@ export class TestScene extends Phaser.Scene {
     super({key: "Test"});
   }
 
-  // public preload() {}
+  public preload() {
+    this.load.image("hook", hookSprite);
+  }
 
   public create() {
     this.cursors = this.input.keyboard.createCursorKeys();
 
-    this.BoundsCollisionCategory = 1;
-    this.PlayerCollisionCategory = this.matter.world.nextCategory();
-    this.PlatformCollisionCategory = this.matter.world.nextCategory();
-    this.RopeCollisionCategory = this.matter.world.nextCategory();
+    // This can be done with repeated calls to this.matter.world.nextCategory()
+    // but it doesn't seem to get reset after game.destroy()
+    /* tslint:disable:no-bitwise */
+    this.BoundsCollisionCategory = 1 << 0;
+    this.PlayerCollisionCategory = 1 << 1;
+    this.PlatformCollisionCategory = 1 << 2;
+    this.RopeCollisionCategory = 1 << 3;
 
     this.matter.world.setBounds(
       0,

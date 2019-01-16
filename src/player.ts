@@ -3,6 +3,7 @@ import { TestScene } from "./scenes/test.scene";
 
 interface IRopeSegment extends Phaser.Physics.Matter.Sprite {
   joint?: MatterJS.Constraint;
+  hook?: Phaser.Physics.Matter.Sprite;
 }
 
 export class Player extends Phaser.Physics.Matter.Sprite {
@@ -46,7 +47,36 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     });
 
     this.ropeSegments = [];
-    this.addRopeSegment();
+    const tail = this.addRopeSegment();
+    tail.hook = this.scene.matter.add.sprite(tail.x, tail.y + 60, "hook", undefined, {});
+    tail.hook.setDisplayOrigin(10, 10);
+    tail.hook.setBody({
+      type: "rectangle",
+      width: 14,
+      height: 14,
+    }, {
+      mass: 0.6,
+      frictionAir: 0.2,
+      render: {
+        sprite: {
+          xOffset: -0.08,
+          yOffset: 0.14,
+        },
+      },
+    });
+    // hack to make the hook white instead of black
+    tail.hook.setTintFill(0xffffff);
+    tail.hook.setCollisionCategory(this.scene.RopeCollisionCategory);
+    tail.hook.setCollidesWith([this.scene.BoundsCollisionCategory]);
+    tail.joint = this.scene.matter.add.joint(tail, tail.hook, 8, 0.6, {
+        pointA: {x: 0, y: 4},
+        pointB: {x: 3, y: -10},
+        render: {
+          anchors: false,
+          lineWidth: 1,
+          type: "line",
+        },
+      });
   }
 
   public update(time: number, delta: number): void {
@@ -95,7 +125,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     const head = this.getRopeHead();
     const [x, y] = head ? [head.x, head.y] : [this.x, this.y + 50];
 
-    const segment = (this.scene.add.rectangle(x, y, 6, 14, 0x00aa00) as any as IRopeSegment);
+    const segment = (this.scene.add.rectangle(x, y, 6, 18, 0x00aa00) as any as IRopeSegment);
     this.scene.matter.add.gameObject(segment, { mass: 0.6, frictionAir: 0.2 });
     segment.setCollisionCategory(this.scene.RopeCollisionCategory);
     segment.setCollidesWith([
@@ -125,7 +155,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
 
   private removeRopeSegment(): void {
     const head = this.getRopeHead();
-    if (!head) { return; }
+    if (!head || head.hook) { return; }
 
     if (head.joint) {
       this.scene.matter.world.removeConstraint(head.joint, false);
