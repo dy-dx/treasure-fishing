@@ -1,3 +1,6 @@
+// this import must be at the top of the file
+import "./vendor";
+
 import createGame from "./game";
 
 const div = document.getElementById("main");

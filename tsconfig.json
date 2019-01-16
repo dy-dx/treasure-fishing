@@ -3,13 +3,15 @@
         "allowJs": true,
         "sourceMap": true,
         "target": "es2018",
+        "module": "esNext",
         "moduleResolution": "node",
         "esModuleInterop": true,
         "resolveJsonModule": true,
         "noImplicitAny": true,
         "noImplicitReturns": true,
         "noUnusedLocals": true,
-        "strict": true
+        "strict": true,
+        "types": ["node", "webpack-env"]
     },
     "files": [
         "node_modules/phaser3-docs/typescript/phaser.d.ts"

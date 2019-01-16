@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "clean": "git clean -fdX dist",
+    "lint": "tsc --noEmit && tslint -p .",
     "dev": "npm run clean && parcel index.html",
     "build": "npm run clean && parcel build index.html --public-url ./dist/"
   },
