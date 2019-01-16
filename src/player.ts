@@ -10,6 +10,9 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   public scene!: TestScene;
 
   public ropeSegments: IRopeSegment[];
+  public hook!: Phaser.Physics.Matter.Sprite;
+
+  public hookedChest?: Phaser.Physics.Matter.Sprite;
 
   public retractRopeTimer: Phaser.Time.TimerEvent;
   public extendRopeTimer: Phaser.Time.TimerEvent;
@@ -49,14 +52,17 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     this.ropeSegments = [];
     const tail = this.addRopeSegment();
     tail.hook = this.scene.matter.add.sprite(tail.x, tail.y + 60, "hook", undefined, {});
+    this.hook = tail.hook;
+    tail.hook.setName("hook");
     tail.hook.setDisplayOrigin(10, 10);
     tail.hook.setBody({
       type: "rectangle",
       width: 14,
       height: 14,
     }, {
-      mass: 0.6,
-      frictionAir: 0.2,
+      friction: 0.1,
+      frictionAir: 0.1,
+      chamfer: { radius: 4 },
       render: {
         sprite: {
           xOffset: -0.08,
@@ -67,7 +73,10 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     // hack to make the hook white instead of black
     tail.hook.setTintFill(0xffffff);
     tail.hook.setCollisionCategory(this.scene.RopeCollisionCategory);
-    tail.hook.setCollidesWith([this.scene.BoundsCollisionCategory]);
+    tail.hook.setCollidesWith([
+      this.scene.BoundsCollisionCategory,
+      this.scene.ChestCollisionCategory,
+    ]);
     tail.joint = this.scene.matter.add.joint(tail, tail.hook, 8, 0.6, {
         pointA: {x: 0, y: 4},
         pointB: {x: 3, y: -10},
@@ -100,10 +109,31 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     }
 
     const ropeHead = this.getRopeHead();
-    if (ropeHead) {
-      ropeHead.setX(this.x);
-      ropeHead.setY(this.y + 50);
+    ropeHead.setPosition(this.x, this.y + 50);
+  }
+
+  public onHookTouch(body: any) {
+    if (
+      this.hookedChest
+      || !body.gameObject
+      || body.gameObject.name !== "chest"
+      || !body.isSensor
+    ) {
+      return;
     }
+
+    this.hookedChest = body.gameObject as Phaser.Physics.Matter.Sprite;
+    this.hookedChest.setMass(0.1);
+
+    this.scene.matter.add.joint(this.hook, body.parent, 0, 0.6, {
+      pointA: {x: 0, y: 0},
+      pointB: {x: 0, y: -40},
+      render: {
+        anchors: false,
+        lineWidth: 1,
+        type: "line",
+      },
+    });
   }
 
   private extendRope(): void {
@@ -126,11 +156,16 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     const [x, y] = head ? [head.x, head.y] : [this.x, this.y + 50];
 
     const segment = (this.scene.add.rectangle(x, y, 6, 18, 0x00aa00) as any as IRopeSegment);
-    this.scene.matter.add.gameObject(segment, { mass: 0.6, frictionAir: 0.2 });
+    this.scene.matter.add.gameObject(segment, {
+      chamfer: { radius: 2 },
+      mass: 0.01,
+      friction: 0.05,
+      frictionAir: 0.1,
+    });
     segment.setCollisionCategory(this.scene.RopeCollisionCategory);
     segment.setCollidesWith([
       this.scene.BoundsCollisionCategory,
-      // this.scene.RopeCollisionCategory,
+      this.scene.ChestCollisionCategory,
     ]);
 
     segment.setStatic(true);
