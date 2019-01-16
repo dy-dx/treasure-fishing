@@ -8,7 +8,9 @@ cd "$SCRIPT_DIR"
 git checkout gh-pages
 git rebase master
 
-rm -rf dist && mkdir dist
-tsc
+rm dist/*
+git checkout master index.html
+npm run build
+cp dist/index.html index.html
 
 echo "Build successful."
